@@ -71,3 +71,6 @@ details ul { margin: 12px 0 0; padding-left: 1.25em; color: var(--muted); line-h
 .danger-zone { display: grid; gap: 12px; }
 .danger-zone p { margin: 0; line-height: 1.7; }
 .danger-btn { color: var(--danger); border-color: #d8b1b1; }
+.unit-picker { display: grid; gap: 7px; }
+.unit-select { width: 100%; min-height: 48px; border: 1px solid var(--border); background: #fff; color: #111; border-radius: 12px; padding: 10px 12px; font: inherit; font-weight: 650; }
+.unit-select:disabled { color: var(--muted); background: var(--soft); }
