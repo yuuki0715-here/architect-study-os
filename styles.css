@@ -77,3 +77,10 @@ details ul { margin: 12px 0 0; padding-left: 1.25em; color: var(--muted); line-h
 
 .question-figure { margin: 0; padding: 8px 0 2px; }
 .question-figure img { display: block; width: 100%; height: auto; border: 1px solid var(--border); border-radius: 12px; background: #fff; }
+
+.app-version { display: inline-block; margin-left: .5em; padding: 2px 7px; border-radius: 999px; background: var(--soft); color: #444; font-size: 11px; letter-spacing: 0; font-weight: 700; vertical-align: 1px; }
+.app-info-card { display: grid; gap: 10px; }
+.app-info-list { margin: 0; display: grid; gap: 8px; }
+.app-info-list > div { display: flex; justify-content: space-between; gap: 16px; padding-top: 8px; border-top: 1px solid var(--soft); }
+.app-info-list dt { color: var(--muted); }
+.app-info-list dd { margin: 0; font-weight: 700; text-align: right; }

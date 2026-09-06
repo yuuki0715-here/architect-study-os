@@ -1,4 +1,4 @@
-# Study OS PWA v0.5 仕様
+# Study OS PWA v0.5.2 仕様
 
 - 公開: アプリ本体のみ
 - 問題: 個人用JSONから端末へ読み込み
@@ -9,11 +9,17 @@
 - 重複判定: 問題ID
 - 全体進捗分母: 1,250問
 - 初回回答だけ全体進捗に加算
-- 設定: PWA進捗リセット / 現在分野の問題データ削除
+- 設定: PWA進捗リセット / 現在分野の問題データ削除 / アプリ情報
+- 図問題: `imageDataUrl` / `imageAlt` を任意利用
 
+## バージョン表示ルール
+- ヘッダーに完全なバージョン番号（major.minor.patch）を常時表示する。
+- 設定 > アプリ情報にも同じ完全バージョンを表示する。
+- README / SPEC / Service Worker cache / 静的アセットのcache-busting queryを同じバージョンにそろえる。
+- 今回のVersion: `v0.5.2`
+- Build: `2026-09-07`
+- 問題データ形式: `unit JSON v1`
 
-## v0.5.1 図問題
-- 個人用JSONに `imageDataUrl`（`data:image/...`）を任意で持たせられる。
-- `imageAlt` を任意指定できる。
-- 図がない問題は従来どおりテキストだけで表示する。
-- 図は問題本文の直後、選択肢の前に表示する。
+## 互換性
+- `STORAGE_KEY = architect-study-os-v0.3` は変更しない。既存の端末内進捗を保持するため。
+- IndexedDB名・ストア名も既存版から変更しない。

@@ -428,7 +428,7 @@ els.resetBtn.addEventListener('click', () => {
 });
 
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => navigator.serviceWorker.register('./service-worker.js?v=0.5.1'));
+  window.addEventListener('load', () => navigator.serviceWorker.register('./service-worker.js?v=0.5.2'));
 }
 
 try {

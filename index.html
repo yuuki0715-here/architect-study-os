@@ -8,16 +8,16 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="Study OS" />
   <title>一級建築士 Study OS</title>
-  <link rel="manifest" href="./manifest.webmanifest?v=0.5" />
+  <link rel="manifest" href="./manifest.webmanifest?v=0.5.2" />
   <link rel="icon" href="./icon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
-  <link rel="stylesheet" href="./styles.css?v=0.5" />
+  <link rel="stylesheet" href="./styles.css?v=0.5.2" />
 </head>
 <body>
   <main class="app-shell">
     <header class="topbar">
       <div>
-        <p class="eyebrow">一級建築士 Study OS</p>
+        <p class="eyebrow">一級建築士 Study OS <span class="app-version">v0.5.2</span></p>
         <h1 id="screen-title">Study OS</h1>
       </div>
       <button id="settings-btn" class="text-btn" type="button">設定</button>
@@ -79,7 +79,7 @@
       </div>
 
       <details class="card compact">
-        <summary>Version 0.5 の仕組み</summary>
+        <summary>Version 0.5.2 の仕組み</summary>
         <ul>
           <li>Web公開するのはアプリ本体だけ</li>
           <li>過去問本文・選択肢は端末内のIndexedDBに保存</li>
@@ -101,6 +101,15 @@
       <div class="card">
         <h2 class="section-title">設定</h2>
         <p class="muted">普段は変更しなくて大丈夫です。</p>
+      </div>
+
+      <div class="card app-info-card">
+        <h2 class="section-title">アプリ情報</h2>
+        <dl class="app-info-list">
+          <div><dt>Version</dt><dd>v0.5.2</dd></div>
+          <div><dt>Build</dt><dd>2026-09-07</dd></div>
+          <div><dt>問題データ形式</dt><dd>unit JSON v1</dd></div>
+        </dl>
       </div>
 
       <div class="card danger-zone">
@@ -144,6 +153,6 @@
     </section>
   </main>
 
-  <script src="./app.js?v=0.5.1" type="module"></script>
+  <script src="./app.js?v=0.5.2" type="module"></script>
 </body>
 </html>
