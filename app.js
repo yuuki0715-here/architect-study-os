@@ -4,17 +4,23 @@ const DB_NAME = 'architect-study-os';
 const DB_VERSION = 1;
 const STORE_NAME = 'questionBanks';
 const BANK_KEY = 'western-architecture';
+const STUDY_TOTAL = 1250;
 
 const els = {
   home: document.querySelector('#home-screen'),
   quiz: document.querySelector('#quiz-screen'),
+  settings: document.querySelector('#settings-screen'),
   screenTitle: document.querySelector('#screen-title'),
   currentUnit: document.querySelector('#current-unit'),
   countBadge: document.querySelector('#question-count-badge'),
   progressText: document.querySelector('#progress-text'),
   progressBar: document.querySelector('#progress-bar'),
+  overallProgressText: document.querySelector('#overall-progress-text'),
+  overallProgressBar: document.querySelector('#overall-progress-bar'),
   dataStatus: document.querySelector('#data-status'),
   startBtn: document.querySelector('#start-btn'),
+  settingsBtn: document.querySelector('#settings-btn'),
+  settingsBackBtn: document.querySelector('#settings-back-btn'),
   resetBtn: document.querySelector('#reset-btn'),
   backBtn: document.querySelector('#back-btn'),
   quizPosition: document.querySelector('#quiz-position'),
@@ -131,6 +137,10 @@ function answeredCount() {
   return questions.filter(q => state.answers[q.id]?.firstAnsweredAt).length;
 }
 
+function overallAnsweredCount() {
+  return Object.values(state.answers || {}).filter(a => a?.firstAnsweredAt).length;
+}
+
 function updateHome(message = '') {
   const done = answeredCount();
   const total = questions.length;
@@ -139,6 +149,12 @@ function updateHome(message = '') {
   els.countBadge.textContent = `${total}問`;
   els.progressText.textContent = `${done} / ${total}（${pct}%）`;
   els.progressBar.style.width = `${pct}%`;
+
+  const overallDone = overallAnsweredCount();
+  const overallPct = STUDY_TOTAL ? Math.round(overallDone / STUDY_TOTAL * 10000) / 100 : 0;
+  els.overallProgressText.textContent = `${overallDone} / ${STUDY_TOTAL.toLocaleString('ja-JP')}（${overallPct}%）`;
+  els.overallProgressBar.style.width = `${Math.min(overallPct, 100)}%`;
+
   els.startBtn.disabled = total === 0;
   els.startBtn.textContent = done > 0 ? '学習を再開' : '学習を開始';
 
@@ -155,9 +171,17 @@ function updateHome(message = '') {
 
 function showHome() {
   els.quiz.classList.add('hidden');
+  els.settings.classList.add('hidden');
   els.home.classList.remove('hidden');
   els.screenTitle.textContent = `${UNIT.subject}・${UNIT.field}`;
   updateHome();
+}
+
+function showSettings() {
+  els.home.classList.add('hidden');
+  els.quiz.classList.add('hidden');
+  els.settings.classList.remove('hidden');
+  els.screenTitle.textContent = '設定';
 }
 
 function showQuestion() {
@@ -247,6 +271,8 @@ function escapeHtml(value) {
 }
 
 els.startBtn.addEventListener('click', showQuestion);
+els.settingsBtn.addEventListener('click', showSettings);
+els.settingsBackBtn.addEventListener('click', showHome);
 els.backBtn.addEventListener('click', showHome);
 els.nextBtn.addEventListener('click', nextQuestion);
 els.importBtn.addEventListener('click', () => els.fileInput.click());

@@ -1,17 +1,8 @@
-# Study OS PWA v0.3 仕様
+# Study OS PWA v0.4
 
-- 学習単位: 計画 ＞ 西洋建築
-- 問題バンク: ユーザーがJSONを端末へインポート
-- 公開サイト側には問題本文を保持しない
-- バンク検証条件:
-  - origin = real_past_exam
-  - verified = true
-  - subject = 計画
-  - field = 西洋建築
-  - 4選択肢
-  - 正答1〜4
-  - 出典情報あり
-- 問題保存: IndexedDB
-- 進捗保存: localStorage
-- 採点: クライアント側即時
-- PWA: Service Worker / manifest / iOS home screen metadata
+- ホーム: 現在単位の進捗 + PWA記録の全体進捗
+- 設定: 進捗リセット / 端末問題データ削除
+- 演習: 4択、即時採点、解説、次問
+- 問題データ: IndexedDB
+- 進捗: localStorage（v0.3と同じ保存キーを維持）
+- 全体分母: 1,250問

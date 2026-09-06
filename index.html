@@ -20,7 +20,7 @@
         <p class="eyebrow">一級建築士 Study OS</p>
         <h1 id="screen-title">計画・西洋建築</h1>
       </div>
-      <button id="reset-btn" class="text-btn" type="button">進捗リセット</button>
+      <button id="settings-btn" class="text-btn" type="button">設定</button>
     </header>
 
     <section id="home-screen" class="screen">
@@ -46,6 +46,20 @@
         <button id="start-btn" class="primary-btn" type="button">学習を開始</button>
       </div>
 
+      <div class="card overall-progress-card">
+        <div class="row between center">
+          <div>
+            <p class="muted small-label">Study OS 全体</p>
+            <h2 class="section-title">全体進捗 <span class="muted progress-note">（PWA記録）</span></h2>
+          </div>
+          <strong id="overall-progress-text">0 / 1,250（0%）</strong>
+        </div>
+        <div class="progress-track" aria-hidden="true">
+          <div id="overall-progress-bar" class="progress-bar" style="width:0%"></div>
+        </div>
+        <p class="muted helper-text">このPWAで初回回答したユニーク問題だけを集計します。ChatGPT側の既存学習履歴はまだ含みません。</p>
+      </div>
+
       <div id="data-status" class="card notice"></div>
 
       <div class="card">
@@ -53,13 +67,12 @@
         <p class="muted">問題本文はWeb上に置かず、この端末だけに保存します。</p>
         <div class="action-stack">
           <button id="import-btn" class="secondary-btn" type="button">問題データを読み込む</button>
-          <button id="delete-bank-btn" class="text-btn danger-text" type="button">端末の問題データを削除</button>
         </div>
         <input id="file-input" type="file" accept="application/json,.json" hidden />
       </div>
 
       <details class="card compact">
-        <summary>Version 0.3 の仕組み</summary>
+        <summary>Version 0.4 の仕組み</summary>
         <ul>
           <li>Web公開するのはアプリ本体だけ</li>
           <li>過去問本文・選択肢は端末内のIndexedDBに保存</li>
@@ -69,6 +82,29 @@
           <li>一度読み込めば、オフラインでも演習可能</li>
         </ul>
       </details>
+    </section>
+
+    <section id="settings-screen" class="screen hidden">
+      <div class="quiz-meta row between center">
+        <button id="settings-back-btn" class="text-btn" type="button">← ホーム</button>
+      </div>
+
+      <div class="card">
+        <h2 class="section-title">設定</h2>
+        <p class="muted">普段は変更しなくて大丈夫です。</p>
+      </div>
+
+      <div class="card danger-zone">
+        <h2 class="section-title">学習履歴</h2>
+        <p class="muted">問題データは残したまま、回答履歴と現在地を最初からやり直します。</p>
+        <button id="reset-btn" class="secondary-btn danger-btn" type="button">進捗をリセット</button>
+      </div>
+
+      <div class="card danger-zone">
+        <h2 class="section-title">問題データ</h2>
+        <p class="muted">端末に保存した問題本文・選択肢を削除します。進捗履歴は残ります。</p>
+        <button id="delete-bank-btn" class="secondary-btn danger-btn" type="button">端末の問題データを削除</button>
+      </div>
     </section>
 
     <section id="quiz-screen" class="screen hidden" aria-live="polite">

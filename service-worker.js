@@ -1,4 +1,4 @@
-const CACHE = 'study-os-v0.3';
+const CACHE = 'study-os-v0.4';
 const ASSETS = [
   './',
   './index.html',

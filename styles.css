@@ -63,3 +63,11 @@ details ul { margin: 12px 0 0; padding-left: 1.25em; color: var(--muted); line-h
 .action-stack { display: grid; gap: 10px; margin-top: 14px; }
 .secondary-btn { width: 100%; border: 1px solid #222; background: #fff; color: #111; border-radius: 14px; padding: 14px 16px; font: inherit; font-weight: 700; }
 .danger-text { color: #8a1f17; }
+
+.small-label { margin: 0 0 4px; font-size: 12px; }
+.progress-note { font-size: .78em; font-weight: 500; }
+.overall-progress-card { display: grid; gap: 12px; }
+.helper-text { margin: 0; font-size: 12px; line-height: 1.6; }
+.danger-zone { display: grid; gap: 12px; }
+.danger-zone p { margin: 0; line-height: 1.7; }
+.danger-btn { color: var(--danger); border-color: #d8b1b1; }
