@@ -74,3 +74,6 @@ details ul { margin: 12px 0 0; padding-left: 1.25em; color: var(--muted); line-h
 .unit-picker { display: grid; gap: 7px; }
 .unit-select { width: 100%; min-height: 48px; border: 1px solid var(--border); background: #fff; color: #111; border-radius: 12px; padding: 10px 12px; font: inherit; font-weight: 650; }
 .unit-select:disabled { color: var(--muted); background: var(--soft); }
+
+.question-figure { margin: 0; padding: 8px 0 2px; }
+.question-figure img { display: block; width: 100%; height: auto; border: 1px solid var(--border); border-radius: 12px; background: #fff; }

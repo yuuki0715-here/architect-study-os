@@ -1,10 +1,10 @@
-const CACHE = 'study-os-v0.5';
+const CACHE = 'study-os-v0.5.1';
 const ASSETS = [
   './',
   './index.html',
-  './styles.css?v=0.5',
-  './app.js?v=0.5',
-  './manifest.webmanifest?v=0.5',
+  './styles.css?v=0.5.1',
+  './app.js?v=0.5.1',
+  './manifest.webmanifest?v=0.5.1',
   './icon.svg',
   './apple-touch-icon.png',
   './icon-192.png',

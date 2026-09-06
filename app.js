@@ -30,6 +30,8 @@ const els = {
   classificationBadge: document.querySelector('#classification-badge'),
   heading: document.querySelector('#question-heading'),
   questionText: document.querySelector('#question-text'),
+  questionFigure: document.querySelector('#question-figure'),
+  questionImage: document.querySelector('#question-image'),
   choices: document.querySelector('#choices'),
   resultCard: document.querySelector('#result-card'),
   resultTitle: document.querySelector('#result-title'),
@@ -143,7 +145,8 @@ function validateQuestion(q) {
     Array.isArray(q.choices) && q.choices.length === 4 && q.choices.every(Boolean) &&
     Number.isInteger(q.answer) && q.answer >= 1 && q.answer <= 4 &&
     typeof q.explanation === 'string' && q.explanation.trim() &&
-    q.source && typeof q.source.label === 'string';
+    q.source && typeof q.source.label === 'string' &&
+    (q.imageDataUrl === undefined || (typeof q.imageDataUrl === 'string' && q.imageDataUrl.startsWith('data:image/')));
 }
 
 function normalizeQuestions(raw) {
@@ -275,6 +278,15 @@ function showQuestion() {
   els.classificationBadge.textContent = q.classificationLabel || q.field;
   els.heading.textContent = `学科I 問${q.questionNumber}`;
   els.questionText.textContent = q.prompt;
+  if (q.imageDataUrl) {
+    els.questionImage.src = q.imageDataUrl;
+    els.questionImage.alt = q.imageAlt || '問題に必要な図';
+    els.questionFigure.classList.remove('hidden');
+  } else {
+    els.questionImage.removeAttribute('src');
+    els.questionImage.alt = '問題図';
+    els.questionFigure.classList.add('hidden');
+  }
   els.choices.innerHTML = '';
   els.resultCard.className = 'card result-card hidden';
 
@@ -416,7 +428,7 @@ els.resetBtn.addEventListener('click', () => {
 });
 
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => navigator.serviceWorker.register('./service-worker.js?v=0.5'));
+  window.addEventListener('load', () => navigator.serviceWorker.register('./service-worker.js?v=0.5.1'));
 }
 
 try {
