@@ -5,7 +5,14 @@ const STORE_NAME = 'questionBanks';
 const LEGACY_BANK_KEY = 'western-architecture';
 const BANK_PREFIX = 'unit::';
 const STUDY_TOTAL = 1250;
-const PLANNING_TOTAL = 200;
+const SUBJECTS = [
+  { key: '計画', exam: '学科Ⅰ', total: 200 },
+  { key: '環境・設備', exam: '学科Ⅱ', total: 200 },
+  { key: '法規', exam: '学科Ⅲ', total: 300 },
+  { key: '構造', exam: '学科Ⅳ', total: 300 },
+  { key: '施工', exam: '学科Ⅴ', total: 250 },
+];
+const SUBJECT_ORDER = SUBJECTS.map(s => s.key);
 
 const els = {
   home: document.querySelector('#home-screen'),
@@ -19,12 +26,17 @@ const els = {
   progressBar: document.querySelector('#progress-bar'),
   overallProgressText: document.querySelector('#overall-progress-text'),
   overallProgressBar: document.querySelector('#overall-progress-bar'),
-  planningLoadedBadge: document.querySelector('#planning-loaded-badge'),
-  planningProgressText: document.querySelector('#planning-progress-text'),
-  planningProgressBar: document.querySelector('#planning-progress-bar'),
-  planningDataNote: document.querySelector('#planning-data-note'),
-  planningFieldsSummary: document.querySelector('#planning-fields-summary'),
-  planningFieldsList: document.querySelector('#planning-fields-list'),
+  subjectSwitcher: document.querySelector('#subject-switcher'),
+  subjectExamLabel: document.querySelector('#subject-exam-label'),
+  subjectName: document.querySelector('#subject-name'),
+  subjectLoadedBadge: document.querySelector('#subject-loaded-badge'),
+  subjectProgressLabel: document.querySelector('#subject-progress-label'),
+  subjectProgressText: document.querySelector('#subject-progress-text'),
+  subjectProgressBar: document.querySelector('#subject-progress-bar'),
+  subjectDataNote: document.querySelector('#subject-data-note'),
+  subjectFieldsTitle: document.querySelector('#subject-fields-title'),
+  subjectFieldsSummary: document.querySelector('#subject-fields-summary'),
+  subjectFieldsList: document.querySelector('#subject-fields-list'),
   dataStatus: document.querySelector('#data-status'),
   startBtn: document.querySelector('#start-btn'),
   settingsBtn: document.querySelector('#settings-btn'),
@@ -54,6 +66,7 @@ let questions = [];
 let cursor = 0;
 let currentUnitKey = null;
 let state = loadState();
+let activeSubject = state.activeSubject || '計画';
 
 function loadState() {
   try {
@@ -62,14 +75,22 @@ function loadState() {
       answers: parsed?.answers || {},
       cursorByUnit: parsed?.cursorByUnit || {},
       currentUnitKey: parsed?.currentUnitKey || null,
+      currentUnitBySubject: parsed?.currentUnitBySubject || {},
+      activeSubject: SUBJECT_ORDER.includes(parsed?.activeSubject) ? parsed.activeSubject : '計画',
     };
   } catch {
-    return { answers: {}, cursorByUnit: {}, currentUnitKey: null };
+    return { answers: {}, cursorByUnit: {}, currentUnitKey: null, currentUnitBySubject: {}, activeSubject: '計画' };
   }
 }
 
 function saveState() {
   state.currentUnitKey = currentUnitKey;
+  state.activeSubject = activeSubject;
+  state.currentUnitBySubject = state.currentUnitBySubject || {};
+  if (currentUnitKey) {
+    const unit = parseUnitKey(currentUnitKey);
+    if (unit.subject) state.currentUnitBySubject[unit.subject] = currentUnitKey;
+  }
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 }
 
@@ -84,10 +105,13 @@ function parseUnitKey(key) {
 }
 
 function currentUnit() {
-  return currentUnitKey ? parseUnitKey(currentUnitKey) : { subject: '計画', field: '未選択' };
+  return currentUnitKey ? parseUnitKey(currentUnitKey) : { subject: activeSubject, field: '未選択' };
 }
 
-const SUBJECT_ORDER = ['計画', '環境・設備', '法規', '構造', '施工'];
+
+function subjectConfig(subject = activeSubject) {
+  return SUBJECTS.find(s => s.key === subject) || SUBJECTS[0];
+}
 
 function unitAverageQuestionNumber(key) {
   const bank = banks.get(key) || [];
@@ -235,8 +259,19 @@ async function loadBanks() {
       banks.set(key, valid);
     }
   }
-  if (state.currentUnitKey && banks.has(state.currentUnitKey)) currentUnitKey = state.currentUnitKey;
-  else currentUnitKey = sortedUnitKeys()[0] || null;
+  const savedSubject = SUBJECT_ORDER.includes(state.activeSubject) ? state.activeSubject : '計画';
+  activeSubject = savedSubject;
+
+  const savedForSubject = state.currentUnitBySubject?.[activeSubject];
+  if (savedForSubject && banks.has(savedForSubject)) {
+    currentUnitKey = savedForSubject;
+  } else if (state.currentUnitKey && banks.has(state.currentUnitKey) &&
+             parseUnitKey(state.currentUnitKey).subject === activeSubject) {
+    currentUnitKey = state.currentUnitKey;
+  } else {
+    currentUnitKey = subjectUnitKeys(activeSubject)[0] || null;
+  }
+
   loadCurrentQuestions();
 }
 
@@ -266,8 +301,8 @@ function answeredCountForQuestions(list) {
   return list.filter(q => state.answers[q.id]?.firstAnsweredAt).length;
 }
 
-function planningQuestions() {
-  return subjectQuestions('計画');
+function activeSubjectQuestions() {
+  return subjectQuestions(activeSubject);
 }
 
 function nextIncompleteUnitKey(subject, afterKey = currentUnitKey) {
@@ -284,30 +319,70 @@ function nextIncompleteUnitKey(subject, afterKey = currentUnitKey) {
   return null;
 }
 
-function renderPlanningDashboard() {
-  const qs = planningQuestions();
-  const loaded = qs.length;
-  const done = answeredCountForQuestions(qs);
-  const pct = PLANNING_TOTAL ? Math.round(done / PLANNING_TOTAL * 10000) / 100 : 0;
+function selectSubject(subject) {
+  if (!SUBJECT_ORDER.includes(subject)) return;
+  activeSubject = subject;
 
-  els.planningLoadedBadge.textContent = `${loaded} / ${PLANNING_TOTAL}問`;
-  els.planningProgressText.textContent = `${done} / ${PLANNING_TOTAL}（${pct}%）`;
-  els.planningProgressBar.style.width = `${Math.min(pct, 100)}%`;
-
-  if (loaded >= PLANNING_TOTAL) {
-    els.planningDataNote.textContent = '計画10年分200問を端末内に保存済みです。';
-  } else if (loaded > 0) {
-    els.planningDataNote.textContent = `計画は現在${loaded} / ${PLANNING_TOTAL}問を読み込み済みです。統合JSONを追加すると不足分を補えます。`;
+  const savedKey = state.currentUnitBySubject?.[subject];
+  if (savedKey && banks.has(savedKey)) {
+    currentUnitKey = savedKey;
   } else {
-    els.planningDataNote.textContent = '計画10年分の問題データを読み込むと、200問の進捗をここで管理できます。';
+    currentUnitKey = subjectUnitKeys(subject)[0] || null;
   }
 
-  const keys = subjectUnitKeys('計画');
-  els.planningFieldsSummary.textContent = `${keys.length}分野`;
-  els.planningFieldsList.innerHTML = '';
+  loadCurrentQuestions();
+  saveState();
+  showHome();
+}
+
+function renderSubjectSwitcher() {
+  els.subjectSwitcher.innerHTML = '';
+
+  for (const cfg of SUBJECTS) {
+    const qs = subjectQuestions(cfg.key);
+    const done = answeredCountForQuestions(qs);
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = `subject-chip${cfg.key === activeSubject ? ' active' : ''}`;
+    button.innerHTML = `
+      <span class="subject-chip-exam">${cfg.exam.replace('学科', '')}</span>
+      <span class="subject-chip-name">${escapeHtml(cfg.key)}</span>
+      <span class="subject-chip-count">${done}/${cfg.total}</span>
+    `;
+    button.addEventListener('click', () => selectSubject(cfg.key));
+    els.subjectSwitcher.appendChild(button);
+  }
+}
+
+function renderSubjectDashboard() {
+  const cfg = subjectConfig();
+  const qs = activeSubjectQuestions();
+  const loaded = qs.length;
+  const done = answeredCountForQuestions(qs);
+  const pct = cfg.total ? Math.round(done / cfg.total * 10000) / 100 : 0;
+
+  els.subjectExamLabel.textContent = cfg.exam;
+  els.subjectName.textContent = cfg.key;
+  els.subjectLoadedBadge.textContent = `${loaded} / ${cfg.total}問`;
+  els.subjectProgressLabel.textContent = `${cfg.key} 全体進捗`;
+  els.subjectProgressText.textContent = `${done} / ${cfg.total}（${pct}%）`;
+  els.subjectProgressBar.style.width = `${Math.min(pct, 100)}%`;
+  els.subjectFieldsTitle.textContent = `${cfg.key} 分野一覧`;
+
+  if (loaded >= cfg.total) {
+    els.subjectDataNote.textContent = `${cfg.key}10年分${cfg.total}問を端末内に保存済みです。`;
+  } else if (loaded > 0) {
+    els.subjectDataNote.textContent = `${cfg.key}は現在${loaded} / ${cfg.total}問を読み込み済みです。追加JSONで不足分を補えます。`;
+  } else {
+    els.subjectDataNote.textContent = `${cfg.key}の問題データはまだ入っていません。`;
+  }
+
+  const keys = subjectUnitKeys(activeSubject);
+  els.subjectFieldsSummary.textContent = `${keys.length}分野`;
+  els.subjectFieldsList.innerHTML = '';
 
   if (!keys.length) {
-    els.planningFieldsList.innerHTML = '<p class="muted helper-text">計画の問題データを読み込むと、ここに分野一覧が表示されます。</p>';
+    els.subjectFieldsList.innerHTML = `<p class="muted helper-text">${escapeHtml(cfg.key)}の問題データを読み込むと、ここに分野一覧が表示されます。</p>`;
     return;
   }
 
@@ -336,17 +411,18 @@ function renderPlanningDashboard() {
     `;
     button.addEventListener('click', () => {
       currentUnitKey = key;
+      activeSubject = unit.subject;
       loadCurrentQuestions();
       saveState();
       showHome();
     });
-    els.planningFieldsList.appendChild(button);
+    els.subjectFieldsList.appendChild(button);
   });
 }
 
 function renderUnitSelect() {
   els.unitSelect.innerHTML = '';
-  const keys = sortedUnitKeys();
+  const keys = subjectUnitKeys(activeSubject);
   if (!keys.length) {
     const option = document.createElement('option');
     option.textContent = '問題データなし';
@@ -360,15 +436,16 @@ function renderUnitSelect() {
     const { subject, field } = parseUnitKey(key);
     const option = document.createElement('option');
     option.value = key;
-    option.textContent = `${subject} ＞ ${field}`;
+    option.textContent = field;
     option.selected = key === currentUnitKey;
     els.unitSelect.appendChild(option);
   }
 }
 
 function updateHome(message = '') {
+  renderSubjectSwitcher();
   renderUnitSelect();
-  renderPlanningDashboard();
+  renderSubjectDashboard();
   const unit = currentUnit();
   const done = answeredCount();
   const total = questions.length;
@@ -400,8 +477,8 @@ function showHome() {
   els.quiz.classList.add('hidden');
   els.settings.classList.add('hidden');
   els.home.classList.remove('hidden');
-  const unit = currentUnit();
-  els.screenTitle.textContent = currentUnitKey && unit.subject === '計画' ? '学科Ⅰ 計画' : (currentUnitKey ? `${unit.subject}・${unit.field}` : 'Study OS');
+  const cfg = subjectConfig();
+  els.screenTitle.textContent = `${cfg.exam} ${cfg.key}`;
   updateHome();
 }
 
@@ -423,7 +500,7 @@ function showQuestion() {
   els.yearBadge.textContent = `${q.year}年`;
   els.sourceBadge.textContent = q.source?.label || '公式問題';
   els.classificationBadge.textContent = q.classificationLabel || q.field;
-  els.heading.textContent = `学科I 問${q.questionNumber}`;
+  els.heading.textContent = `${subjectConfig(q.subject).exam} 問${q.questionNumber}`;
   els.questionText.textContent = q.prompt;
   if (q.imageDataUrl) {
     els.questionImage.src = q.imageDataUrl;
@@ -486,8 +563,8 @@ function answerQuestion(choice) {
   if (cursor >= questions.length - 1) {
     const unit = currentUnit();
     const fieldDone = answeredCountForQuestions(questions);
-    const nextKey = unit.subject === '計画' && fieldDone >= questions.length
-      ? nextIncompleteUnitKey('計画', currentUnitKey)
+    const nextKey = fieldDone >= questions.length
+      ? nextIncompleteUnitKey(unit.subject, currentUnitKey)
       : null;
     els.nextBtn.textContent = nextKey ? '次の分野へ' : 'ホームへ戻る';
   } else {
@@ -501,8 +578,8 @@ function nextQuestion() {
     const currentKey = currentUnitKey;
     state.cursorByUnit[currentKey] = 0;
 
-    const nextKey = unit.subject === '計画' && answeredCountForQuestions(questions) >= questions.length
-      ? nextIncompleteUnitKey('計画', currentKey)
+    const nextKey = answeredCountForQuestions(questions) >= questions.length
+      ? nextIncompleteUnitKey(unit.subject, currentKey)
       : null;
 
     if (nextKey) {
@@ -538,6 +615,7 @@ els.unitSelect.addEventListener('change', () => {
   const key = els.unitSelect.value;
   if (!key || !banks.has(key)) return;
   currentUnitKey = key;
+  activeSubject = parseUnitKey(key).subject;
   loadCurrentQuestions();
   saveState();
   showHome();
@@ -565,7 +643,9 @@ els.fileInput.addEventListener('change', async () => {
       banks.set(key, bank);
     }
 
-    currentUnitKey = sortedUnitKeys()[0] || [...grouped.keys()][0];
+    const incomingSubject = incoming[0]?.subject;
+    if (SUBJECT_ORDER.includes(incomingSubject)) activeSubject = incomingSubject;
+    currentUnitKey = subjectUnitKeys(activeSubject)[0] || [...grouped.keys()][0] || null;
     loadCurrentQuestions();
     saveState();
     updateHome(`${grouped.size}分野・${incoming.length}問を追加しました。`);
@@ -582,7 +662,7 @@ els.deleteBankBtn.addEventListener('click', async () => {
   if (!confirm(`「${unit.subject} ＞ ${unit.field}」の問題データを端末から削除しますか？進捗は残ります。`)) return;
   await dbDelete(currentUnitKey);
   banks.delete(currentUnitKey);
-  currentUnitKey = sortedUnitKeys()[0] || null;
+  currentUnitKey = subjectUnitKeys(activeSubject)[0] || null;
   loadCurrentQuestions();
   saveState();
   showHome();
@@ -590,14 +670,14 @@ els.deleteBankBtn.addEventListener('click', async () => {
 
 els.resetBtn.addEventListener('click', () => {
   if (!confirm('この端末に保存されたPWAの進捗をすべて0に戻しますか？問題データは残ります。')) return;
-  state = { answers: {}, cursorByUnit: {}, currentUnitKey };
+  state = { answers: {}, cursorByUnit: {}, currentUnitKey, currentUnitBySubject: state.currentUnitBySubject || {}, activeSubject };
   cursor = 0;
   saveState();
   showHome();
 });
 
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => navigator.serviceWorker.register('./service-worker.js?v=0.6.0'));
+  window.addEventListener('load', () => navigator.serviceWorker.register('./service-worker.js?v=0.7.0'));
 }
 
 try {

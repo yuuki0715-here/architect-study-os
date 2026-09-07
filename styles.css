@@ -153,3 +153,56 @@ details ul { margin: 12px 0 0; padding-left: 1.25em; color: var(--muted); line-h
   .field-row { grid-template-columns: 30px minmax(0, 1fr) auto; padding: 10px; }
   .field-name { font-size: 13px; }
 }
+
+
+/* v0.7.0 科目切替 */
+.subject-switch-card {
+  display: grid;
+  gap: 9px;
+}
+.subject-switcher {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 6px;
+}
+.subject-chip {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+  justify-items: center;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #fff;
+  padding: 8px 3px;
+  color: #111;
+}
+.subject-chip.active {
+  background: #111;
+  color: #fff;
+  border-color: #111;
+}
+.subject-chip-exam {
+  font-size: 10px;
+  font-weight: 800;
+  opacity: .72;
+}
+.subject-chip-name {
+  max-width: 100%;
+  font-size: 11px;
+  font-weight: 800;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.subject-chip-count {
+  font-size: 9px;
+  opacity: .72;
+  white-space: nowrap;
+}
+
+@media (max-width: 420px) {
+  .subject-switcher { gap: 4px; }
+  .subject-chip { padding: 7px 2px; }
+  .subject-chip-name { font-size: 10px; }
+  .subject-chip-count { font-size: 8px; }
+}
