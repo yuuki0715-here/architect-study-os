@@ -132,7 +132,24 @@ async function dbKeys() {
   });
 }
 
+function acceptedAnswers(q) {
+  if (Array.isArray(q?.acceptedAnswers) && q.acceptedAnswers.length) {
+    return [...new Set(q.acceptedAnswers)].filter(
+      n => Number.isInteger(n) && n >= 1 && n <= 4
+    );
+  }
+  return Number.isInteger(q?.answer) ? [q.answer] : [];
+}
+
 function validateQuestion(q) {
+  const accepted = acceptedAnswers(q);
+  const acceptedAnswersValid = q?.acceptedAnswers === undefined || (
+    Array.isArray(q.acceptedAnswers) &&
+    q.acceptedAnswers.length >= 1 &&
+    q.acceptedAnswers.every(n => Number.isInteger(n) && n >= 1 && n <= 4) &&
+    accepted.includes(q.answer)
+  );
+
   return q &&
     q.origin === 'real_past_exam' &&
     q.verified === true &&
@@ -144,6 +161,7 @@ function validateQuestion(q) {
     typeof q.prompt === 'string' && q.prompt.trim() &&
     Array.isArray(q.choices) && q.choices.length === 4 && q.choices.every(Boolean) &&
     Number.isInteger(q.answer) && q.answer >= 1 && q.answer <= 4 &&
+    accepted.length >= 1 && acceptedAnswersValid &&
     typeof q.explanation === 'string' && q.explanation.trim() &&
     q.source && typeof q.source.label === 'string' &&
     (q.imageDataUrl === undefined || (typeof q.imageDataUrl === 'string' && q.imageDataUrl.startsWith('data:image/')));
@@ -305,7 +323,8 @@ function showQuestion() {
 
 function answerQuestion(choice) {
   const q = questions[cursor];
-  const correct = choice === q.answer;
+  const accepted = acceptedAnswers(q);
+  const correct = accepted.includes(choice);
   const old = state.answers[q.id];
   const now = new Date().toISOString();
 
@@ -326,13 +345,14 @@ function answerQuestion(choice) {
   [...els.choices.children].forEach((btn, index) => {
     const n = index + 1;
     btn.disabled = true;
-    if (n === q.answer) btn.classList.add('correct');
+    if (accepted.includes(n)) btn.classList.add('correct');
     if (n === choice && !correct) btn.classList.add('wrong');
   });
 
+  const answerLabel = accepted.join(' または ');
   els.resultCard.classList.remove('hidden');
   els.resultCard.classList.add(correct ? 'success' : 'error');
-  els.resultTitle.textContent = correct ? '○ 正解です' : `× 不正解　正答は ${q.answer}`;
+  els.resultTitle.textContent = correct ? '○ 正解です' : `× 不正解　正答は ${answerLabel}`;
   els.resultExplanation.textContent = q.explanation;
   els.nextBtn.textContent = cursor >= questions.length - 1 ? 'ホームへ戻る' : '次の問題';
 }
