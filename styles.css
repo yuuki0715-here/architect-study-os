@@ -84,3 +84,72 @@ details ul { margin: 12px 0 0; padding-left: 1.25em; color: var(--muted); line-h
 .app-info-list > div { display: flex; justify-content: space-between; gap: 16px; padding-top: 8px; border-top: 1px solid var(--soft); }
 .app-info-list dt { color: var(--muted); }
 .app-info-list dd { margin: 0; font-weight: 700; text-align: right; }
+
+
+/* v0.6.0 計画200問ダッシュボード */
+.subject-dashboard-card { display: grid; gap: 16px; }
+.subject-dashboard-head { gap: 14px; }
+.dashboard-title { margin: 0; font-size: 1.55rem; }
+.fields-card { display: grid; gap: 14px; }
+.fields-summary { font-size: 13px; color: var(--muted); }
+.fields-list { display: grid; gap: 8px; }
+
+.field-row {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  border: 1px solid var(--border);
+  background: #fff;
+  color: #111;
+  border-radius: 13px;
+  padding: 11px 12px;
+  text-align: left;
+}
+.field-row:active { transform: translateY(1px); }
+.field-row.active { border-color: #111; box-shadow: inset 0 0 0 1px #111; }
+.field-row.complete { background: #f7f7f4; }
+
+.field-order {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: var(--soft);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+.field-row.active .field-order { background: #111; color: #fff; }
+
+.field-main { min-width: 0; display: grid; gap: 7px; }
+.field-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 700;
+  font-size: 14px;
+}
+.field-count { font-weight: 700; font-size: 13px; white-space: nowrap; }
+
+.mini-progress-track {
+  display: block;
+  width: 100%;
+  height: 5px;
+  background: var(--soft);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.mini-progress-bar {
+  display: block;
+  height: 100%;
+  background: #111;
+  border-radius: inherit;
+}
+
+@media (max-width: 420px) {
+  .field-row { grid-template-columns: 30px minmax(0, 1fr) auto; padding: 10px; }
+  .field-name { font-size: 13px; }
+}

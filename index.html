@@ -8,41 +8,56 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="Study OS" />
   <title>一級建築士 Study OS</title>
-  <link rel="manifest" href="./manifest.webmanifest?v=0.5.3" />
+  <link rel="manifest" href="./manifest.webmanifest?v=0.6.0" />
   <link rel="icon" href="./icon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
-  <link rel="stylesheet" href="./styles.css?v=0.5.3" />
+  <link rel="stylesheet" href="./styles.css?v=0.6.0" />
 </head>
 <body>
   <main class="app-shell">
     <header class="topbar">
       <div>
-        <p class="eyebrow">一級建築士 Study OS <span class="app-version">v0.5.3</span></p>
-        <h1 id="screen-title">Study OS</h1>
+        <p class="eyebrow">一級建築士 Study OS <span class="app-version">v0.6.0</span></p>
+        <h1 id="screen-title">学科Ⅰ 計画</h1>
       </div>
       <button id="settings-btn" class="text-btn" type="button">設定</button>
     </header>
 
     <section id="home-screen" class="screen">
+      <div class="card subject-dashboard-card">
+        <div class="row between center subject-dashboard-head">
+          <div>
+            <p class="muted small-label">学科Ⅰ</p>
+            <h2 class="dashboard-title">計画</h2>
+          </div>
+          <span id="planning-loaded-badge" class="badge">0 / 200問</span>
+        </div>
+
+        <div class="progress-block">
+          <div class="row between center">
+            <span>計画 全体進捗</span>
+            <strong id="planning-progress-text">0 / 200（0%）</strong>
+          </div>
+          <div class="progress-track" aria-hidden="true">
+            <div id="planning-progress-bar" class="progress-bar" style="width:0%"></div>
+          </div>
+        </div>
+
+        <p id="planning-data-note" class="muted helper-text">計画10年分の問題データを読み込むと、200問の進捗をここで管理できます。</p>
+      </div>
+
       <div class="card hero">
         <div class="row between center">
           <div>
-            <p class="muted">現在の学習単位</p>
+            <p class="muted">現在の分野</p>
             <h2 id="current-unit">問題データを読み込んでください</h2>
           </div>
           <span id="question-count-badge" class="badge">0問</span>
         </div>
 
-        <div class="unit-picker">
-          <label for="unit-select" class="muted small-label">学習分野を切り替える</label>
-          <select id="unit-select" class="unit-select" disabled>
-            <option>問題データなし</option>
-          </select>
-        </div>
-
         <div class="progress-block">
           <div class="row between center">
-            <span>進捗</span>
+            <span>分野進捗</span>
             <strong id="progress-text">0 / 0</strong>
           </div>
           <div class="progress-track" aria-hidden="true">
@@ -51,20 +66,39 @@
         </div>
 
         <button id="start-btn" class="primary-btn" type="button">学習を開始</button>
+
+        <div class="unit-picker">
+          <label for="unit-select" class="muted small-label">分野を直接切り替える</label>
+          <select id="unit-select" class="unit-select" disabled>
+            <option>問題データなし</option>
+          </select>
+          <p class="muted helper-text">分野は、10年分の平均出題位置が早い順に並びます。</p>
+        </div>
+      </div>
+
+      <div class="card fields-card">
+        <div class="row between center">
+          <div>
+            <p class="muted small-label">本試験の流れに近い順</p>
+            <h2 class="section-title">計画 分野一覧</h2>
+          </div>
+          <strong id="planning-fields-summary" class="fields-summary">0分野</strong>
+        </div>
+        <div id="planning-fields-list" class="fields-list"></div>
       </div>
 
       <div class="card overall-progress-card">
         <div class="row between center">
           <div>
             <p class="muted small-label">Study OS 全体</p>
-            <h2 class="section-title">全体進捗 <span class="muted progress-note">（PWA記録）</span></h2>
+            <h2 class="section-title">5科目 全体進捗 <span class="muted progress-note">（PWA記録）</span></h2>
           </div>
           <strong id="overall-progress-text">0 / 1,250（0%）</strong>
         </div>
         <div class="progress-track" aria-hidden="true">
           <div id="overall-progress-bar" class="progress-bar" style="width:0%"></div>
         </div>
-        <p class="muted helper-text">このPWAで初回回答したユニーク問題だけを集計します。ChatGPT側の既存学習履歴はまだ含みません。</p>
+        <p class="muted helper-text">今後、環境・設備、法規、構造、施工を追加しても同じ履歴に積み上がります。</p>
       </div>
 
       <div id="data-status" class="card notice"></div>
@@ -79,17 +113,15 @@
       </div>
 
       <details class="card compact">
-        <summary>Version 0.5.3 の仕組み</summary>
+        <summary>Version 0.6.0 の仕組み</summary>
         <ul>
-          <li>Web公開するのはアプリ本体だけ</li>
-          <li>過去問本文・選択肢は端末内のIndexedDBに保存</li>
-          <li>4択をタップして即時採点</li>
-          <li>公式で複数正答となる問題にも対応</li>
-          <li>初回回答だけを進捗に加算</li>
-          <li>現在地と回答履歴も端末内に保存</li>
-          <li>複数の科目・分野を同じPWAに追加可能</li>
-          <li>分野を切り替えても進捗は別々に保存</li>
-          <li>一度読み込めば、オフラインでも演習可能</li>
+          <li>計画200問の全体進捗をホームで表示</li>
+          <li>20分野を本試験の出題位置に近い順で一覧表示</li>
+          <li>各分野の「回答済み / 問題数」と進捗バーを表示</li>
+          <li>分野名をタップすると、その分野へ即座に切替</li>
+          <li>現在分野が終わると、次の未完了分野へ移動可能</li>
+          <li>問題本文・選択肢は端末内IndexedDBに保存</li>
+          <li>既存の問題データと進捗はそのまま引き継ぐ</li>
         </ul>
       </details>
     </section>
@@ -107,7 +139,7 @@
       <div class="card app-info-card">
         <h2 class="section-title">アプリ情報</h2>
         <dl class="app-info-list">
-          <div><dt>Version</dt><dd>v0.5.3</dd></div>
+          <div><dt>Version</dt><dd>v0.6.0</dd></div>
           <div><dt>Build</dt><dd>2026-09-07</dd></div>
           <div><dt>問題データ形式</dt><dd>unit JSON v1.1</dd></div>
         </dl>
@@ -154,6 +186,6 @@
     </section>
   </main>
 
-  <script src="./app.js?v=0.5.3" type="module"></script>
+  <script src="./app.js?v=0.6.0" type="module"></script>
 </body>
 </html>
